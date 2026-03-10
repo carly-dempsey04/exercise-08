@@ -1,0 +1,27 @@
+---
+title: "dataanalytics_assignment8"
+format: html
+editor: visual
+---
+
+# Assignment 8
+
+## Preliminaries
+
+```{r}
+library(tidyverse)
+library(skimr)
+```
+
+## Step 1
+
+```{r}
+#Loading in dataset as a tibble named 'd'
+
+f <- "https://raw.githubusercontent.com/difiore/ada-datasets/main/Street_et_al_2017.csv"
+d <- read_csv(f, col_names = TRUE)
+
+#Exploratory data analysis
+skim(d$Social_learning)
+
+```
