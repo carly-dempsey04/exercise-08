@@ -74,3 +74,22 @@ x <- d$Group_size
 (lm(formula = ECV ~ Group_size, data = d, na.rm = TRUE))
 m <- lm(ECV ~ Group_size, d, na.rm = TRUE)
 ```
+
+## Step 5
+
+```{r}
+#Repeat the analysis above for three different major radiations of primates - 
+
+#“catarrhines”
+
+#“platyrrhines” 
+
+#“strepsirhines” 
+
+
+
+
+
+
+#Do your regression coefficients differ among groups? How might you determine this?
+```
