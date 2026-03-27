@@ -1,0 +1,14 @@
+---
+title: "Exercise9 wtf"
+format: html
+editor: visual
+---
+
+## Coding Challenge
+
+```{r}
+library(tidyverse)
+d <- read.csv("https://github.com/difiore/ada-datasets/blob/main/KamilarAndCooperData.csv")
+library(ggplot2)
+plot(data = d, log(MaxLongevity_m) ~ log())
+```

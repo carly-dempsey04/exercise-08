@@ -12,6 +12,7 @@ editor: visual
 library(tidyverse)
 library(skimr)
 library(ggplot2)
+library(generics)
 ```
 
 ## Step 1
@@ -81,15 +82,60 @@ m <- lm(ECV ~ Group_size, d, na.rm = TRUE)
 #Repeat the analysis above for three different major radiations of primates - 
 
 #“catarrhines”
+ #filter for group
+  cat <- filter(d, Taxonomic_group == "Catarrhini")
+  head(cat)
+ #making my x,y
+  y_cat <- cat$ECV
+  x_cat <- cat$Group_size
+  
+#Finding beta1  
+beta1cat <- cor(x_cat, y_cat,  use = "complete.obs") * (sd(y_cat, na.rm = TRUE)/sd(x_cat, na.rm = TRUE))
+#Finding beta0
+beta0cat <- mean(y_cat, na.rm = TRUE) - beta1cat * mean(x_cat, na.rm = TRUE)
+#Confirm with lm() function
+(lm(formula = ECV ~ Group_size, data = cat, na.rm = TRUE))
 
 #“platyrrhines” 
-
+  #filter for group
+  plat <- filter(d, Taxonomic_group == "Platyrrhini")
+  head(plat)
+ #making my x,y
+  y_plat <- plat$ECV
+  x_plat <- plat$Group_size
+  
+#Finding beta1  
+beta1plat <- cor(x_plat, y_plat,  use = "complete.obs") * (sd(y_plat, na.rm = TRUE)/sd(x_plat, na.rm = TRUE))
+#Finding beta0
+beta0plat <- mean(y_plat, na.rm = TRUE) - beta1plat * mean(x_plat, na.rm = TRUE)
+#Confirm with lm() function
+(lm(formula = ECV ~ Group_size, data = plat, na.rm = TRUE))  
+  
 #“strepsirhines” 
+  #filter for group
+  strep <- filter(d, Taxonomic_group == "Strepsirhini")
+  head(strep)
+ #making my x,y
+  y_strep <- strep$ECV
+  x_strep <- strep$Group_size
 
-
-
+#Finding beta1  
+beta1strep <- cor(x_strep, y_strep,  use = "complete.obs") * (sd(y_strep, na.rm = TRUE)/sd(x_strep, na.rm = TRUE))
+#Finding beta0
+beta0strep <- mean(y_strep, na.rm = TRUE) - beta1strep * mean(x_strep, na.rm = TRUE)
+#Confirm with lm() function
+(lm(formula = ECV ~ Group_size, data = strep, na.rm = TRUE))  
 
 
 
 #Do your regression coefficients differ among groups? How might you determine this?
+
+```
+
+## Step 6
+
+```{r}
+#For your first regression of ECV on social group size, calculate the standard error for the slope coefficient, the 95% CI, and the p value associated with this coefficient by hand. Also extract this same information from the results of running the lm() function.
+
+
 ```
