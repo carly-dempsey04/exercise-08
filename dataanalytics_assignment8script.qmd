@@ -13,25 +13,19 @@ library(tidyverse)
 library(skimr)
 library(ggplot2)
 library(generics)
+library(dplyr)
+library(broom)
 ```
 
 ## Step 1
 
 ```{r}
 #Loading in dataset as a tibble named 'd'
-
 f <- "https://raw.githubusercontent.com/difiore/ada-datasets/main/Street_et_al_2017.csv"
 d <- read_csv(f, col_names = TRUE)
 
 #Exploratory data analysis
 skim(d$Social_learning)
-
-#Mean and SD for each variable
-
-
-
-
-
 ```
 
 ## Step 2
@@ -50,8 +44,6 @@ plot(data = d, log(ECV) ~ log(Weaning))
 
 #reproductive lifespan (Repro_lifespan).
 plot(data = d, log(ECV) ~ log(Repro_lifespan))
-
-
 ```
 
 ## Step 3
@@ -126,16 +118,89 @@ beta0strep <- mean(y_strep, na.rm = TRUE) - beta1strep * mean(x_strep, na.rm = T
 #Confirm with lm() function
 (lm(formula = ECV ~ Group_size, data = strep, na.rm = TRUE))  
 
-
-
-#Do your regression coefficients differ among groups? How might you determine this?
-
 ```
 
 ## Step 6
 
 ```{r}
-#For your first regression of ECV on social group size, calculate the standard error for the slope coefficient, the 95% CI, and the p value associated with this coefficient by hand. Also extract this same information from the results of running the lm() function.
+#I am not going to lie, I feel somewhat decent on the rest of this assignment but 
+#For your first regression of ECV on social group size, calculate the standard error for the slope coefficient, 
+beta1_hat <- coef(fit_lm)[2]
+n <- length(x)
+resid_var <- sum(residuals(fit_lm)^2) / (n - 2) #calculating residual variance
+se_beta1 <- sqrt(resid_var / sum((x - mean(x))^2))
+
+#the 95% CI, 
+ci <- quantile(d, c(0.025, 0.975))
+t_crit <- qt(0.975, df = n - 2)
+ci <- beta1_hat + c(-1, 1) * t_crit * se_beta1
+
+#and the p value associated with this coefficient
+t_stat <- beta1_hat / se_beta1
+p_val <- 2 * (1 - pt(abs(t_stat), df = n - 2))
+
+#Also extract this same information from the results of running the lm() function
+fit_lm <- lm(ECV ~ Group_size, data = d,na.rm = TRUE)
+summary(fit_lm)
+
+```
+
+## Step 7
+
+```{r}
+#Use a permutation approach with 1000 permutations to generate a null sampling distribution for the slope coefficient. 
+
+#Prelims
+nperm <- 1000 #Setting reps
+perm_coefs <- numeric(nperm) #Opening a place to put permutation coeffs into
+
+#Running my permutation
+for (i in seq_len(nperm)) {
+  d_perm <- d
+  d_perm$ECV <- sample(d$ECV)
+  perm_coefs[i] <- lm(Group_size ~ ECV, data = d_perm) %>%
+    tidy() %>%
+    filter(term == "ECV") %>%
+    pull(estimate)
+}
+#Checking histogram
+hist(perm_coefs) #Welp she's a bit crooked but still somewhat normal???
 
 
+```
+
+## Step 8
+
+```{r}
+#Use bootstrapping to generate a 95% CI for your estimate of the slope coefficient using both the quantile method and the theory-based method
+
+#Bootstrap confidence interval
+nboot <- 1000
+boot_coefs <- vector(length = nboot)
+
+for(i in 1:nboot) {
+  d_boot <- d[sample(nrow(d), replace = TRUE), ]
+  boot_coefs[[i]] <- lm(ECV ~ Group_size, data = d_boot) %>%
+    tidy() %>%
+    filter(term == "Group_size") %>%
+    pull(estimate)
+}
+hist(boot_coefs) #Now this looks somewhat decent
+
+#Calculating the confidence interval from the bootstrap 
+ci <- quantile(boot_coefs, c(0.025, 0.975))
+cat("Bootstrap %95 CI", ci[[1]], "to", ci[[2]], "\n")
+#Result -> Bootstrap %95 CI 1.565704 to 3.294318 
+
+#Comparing classic parametric CI from the model which is based on a t statistic
+cat("Parametric 95% CI", tidy(m, conf.int = TRUE) %>%
+    filter(term == "Group_size") %>%
+    pull(conf.low), "to", tidy(m, conf.int = TRUE) %>%
+    filter(term == "Group_size") %>%
+    pull(conf.high), "\n")
+#Result -> Parametric 95% CI 1.769874 to 3.156269 
+
+
+#Do these CIs suggest that your slope coefficient is different from zero?
+##Both CIs being positive indicate a positive linear relationship between ECV and Group size
 ```
