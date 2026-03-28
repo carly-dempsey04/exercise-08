@@ -123,21 +123,27 @@ beta0strep <- mean(y_strep, na.rm = TRUE) - beta1strep * mean(x_strep, na.rm = T
 ## Step 6
 
 ```{r}
-#I am not going to lie, I feel somewhat decent on the rest of this assignment but 
+#I am not going to lie, I feel somewhat decent on the rest of this assignment but am very lost here
 #For your first regression of ECV on social group size, calculate the standard error for the slope coefficient, 
-beta1_hat <- coef(fit_lm)[2]
+
 n <- length(x)
-resid_var <- sum(residuals(fit_lm)^2) / (n - 2) #calculating residual variance
-se_beta1 <- sqrt(resid_var / sum((x - mean(x))^2))
+y1 <- b0_hand + b1_hand * x
+residuals <- y - y1
+sigma2 <- sum(residuals^2) / (n - 2)
+
+#Calculating SE of slope
+SE_b1 <- sqrt(sigma2 / sum((x - (mean(x)))^2))
+SE_b1
+
 
 #the 95% CI, 
 ci <- quantile(d, c(0.025, 0.975))
 t_crit <- qt(0.975, df = n - 2)
-ci <- beta1_hat + c(-1, 1) * t_crit * se_beta1
+ci <- b1_hand + c(-1, 1) * t_crit * SE_b1
 
 #and the p value associated with this coefficient
 t_stat <- beta1_hat / se_beta1
-p_val <- 2 * (1 - pt(abs(t_stat), df = n - 2))
+p_val <- 2 * (1 - pt(abs(t_stat), df = n - 2)) 
 
 #Also extract this same information from the results of running the lm() function
 fit_lm <- lm(ECV ~ Group_size, data = d,na.rm = TRUE)
