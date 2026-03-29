@@ -131,7 +131,7 @@ y1 <- b0_hand + b1_hand * x
 residuals <- y - y1
 sigma2 <- sum(residuals^2) / (n - 2)
 
-#Calculating SE of slope, this is where I botch it 
+#Calculating SE of slope, this is where I botch it, I thibk its because I did not filter the x data properly to remove the blanks :(
 SE_b1 <- sqrt(sigma2 / sum((x - (mean(x)))^2))
 SE_b1
 
