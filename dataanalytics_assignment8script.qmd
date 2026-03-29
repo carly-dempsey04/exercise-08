@@ -25,7 +25,7 @@ f <- "https://raw.githubusercontent.com/difiore/ada-datasets/main/Street_et_al_2
 d <- read_csv(f, col_names = TRUE)
 
 #Exploratory data analysis
-skim(d$Social_learning)
+skim(d)
 ```
 
 ## Step 2
@@ -131,10 +131,9 @@ y1 <- b0_hand + b1_hand * x
 residuals <- y - y1
 sigma2 <- sum(residuals^2) / (n - 2)
 
-#Calculating SE of slope
+#Calculating SE of slope, this is where I botch it 
 SE_b1 <- sqrt(sigma2 / sum((x - (mean(x)))^2))
 SE_b1
-
 
 #the 95% CI, 
 ci <- quantile(d, c(0.025, 0.975))
@@ -142,7 +141,7 @@ t_crit <- qt(0.975, df = n - 2)
 ci <- b1_hand + c(-1, 1) * t_crit * SE_b1
 
 #and the p value associated with this coefficient
-t_stat <- beta1_hat / se_beta1
+t_stat <- b1_hand / SE_b1
 p_val <- 2 * (1 - pt(abs(t_stat), df = n - 2)) 
 
 #Also extract this same information from the results of running the lm() function
@@ -171,8 +170,6 @@ for (i in seq_len(nperm)) {
 }
 #Checking histogram
 hist(perm_coefs) #Welp she's a bit crooked but still somewhat normal???
-
-
 ```
 
 ## Step 8
